@@ -19,7 +19,13 @@ if (!function_exists('get_called_class')):
   }
 endif;
 
-
+function call_static() {
+  $args = func_get_args();
+  $callback = array_shift($args);
+  if (is_string($callback))
+    $callback = explode('::', $callback);
+  return user_func_call_array($callback, $args);
+}
 
 function pluralize($word) {
   return $word . 's';
