@@ -1,57 +1,55 @@
 <?php
+
+require 'simpletest/runner.php';
 require '../active_resource.php';
 
-class Page extends ActiveResource {
-  var $site = 'http://localhost:3000/admin';
+define('RESOURCE_URI', 'http://creagency-insurance.local');
+
+class Article extends ActiveResource {
+  var $site = RESOURCE_URI;
+  
+  function __toString() {
+    return $this->title;
+  }
+}
+
+class Question extends ActiveResource {
+  var $site = RESOURCE_URI;
+  
+  function __toString() {
+    return $this->text;
+  }
 }
 
 
 ## Find all
 
-
-$p = Page::create(array(
-    'title' => 'Hello there elton an title',
-    'body' => 'article body'
-));
 // 
-// $p->title ="This is an title changed";
-// $p->save();
-// 
-// // var_dump(Page::find(1));
-// 
-// // Expecting Object not found exception
-// //var_dump(Page::find(100));
-// 
-// var_dump(Page::find('all'));
-//  
-// 
-// var_dump(Page::find('first'));
-// var_dump(Page::find('all'));
-// var_dump(Page::find('last'));
-// 
-// var_dump(Page::destroy(  Page::find('last')->id)  );
-// var_dump(Page::find('last')->destroy());
-// 
-// var_dump(Page::exists(1));
-// 
-// echo '<hr>';
-// $p = new Page;
-// $p->id = 100;
-// var_dump($p->exists());
-// 
-// 
-// // 
-// 
-// $a = new Page(array(
-//   'title' => 'This an title',
-//   'body' => 'article body'
+// $p = Page::create(array(
+//     'title' => 'Hello there elton an title',
+//     'body' => 'article body'
 // ));
 // 
-// $a->save();
-// // 
-// // $a = Article::find(1);
-// 
-// 
-
 
 ?>
+
+
+<h1> All articles </h1>
+
+<? foreach( Article::find('all') as $article): ?>
+
+ <li><a href=""><?= $article ?></a></li>
+
+<? endforeach ?>
+
+
+<hr>
+
+
+<h1> All Question</h1>
+
+<? foreach( Question::find('all') as $question): ?>
+
+ <li><a href=""><?= $question ?></a></li>
+
+<? endforeach ?>

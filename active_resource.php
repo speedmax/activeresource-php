@@ -166,6 +166,13 @@ class ActiveResource {
       return $results;
     }
 
+    static function config($class) {
+      extract(get_class_vars($class));
+      if ($site[strlen($site) - 1] === '/')
+        $site = substr($site, 0, -1);
+      return compact('site', 'timeout', 'extension');
+    }
+
     static function collection_name($class = null) {
         if (!$class)
           $class = get_called_class();
@@ -173,7 +180,7 @@ class ActiveResource {
     }
       
     static function collection_url($class, $options = array()) {
-      extract(get_class_vars($class));
+      extract(self::config($class));
       $collection = self::collection_name($class);
       
       $query = !empty($options) ? '?' . http_build_query($options) : '';
@@ -182,7 +189,7 @@ class ActiveResource {
     }
 
     static function element_url($id, $class, $options = array()) {
-      extract(get_class_vars($class));
+      extract(self::config($class));
       $collection = self::collection_name($class);
       
       $query = !empty($options) ? '?' . http_build_query($options) : '';
