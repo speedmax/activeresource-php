@@ -99,7 +99,7 @@ class ActiveResource {
     $data = $this->request_body($this->attributes);
     $class = get_class($this);
     
-    if ($this->id) {
+    if (isset($this->id)) {
       $this->connection->headers = array("Content-Type" => "application/xml");
       $this->connection->put(self::element_url($this->id, $class), $data);
       return true;
@@ -122,6 +122,10 @@ class ActiveResource {
   function __set($attr, $value = null) {
     $attr = str_replace('-', '_', $attr);
     return $this->attributes[$attr] = $value;
+  }
+  
+  function __isset($attr) {
+    return isset($this->attributes[$attr]);
   }
 
   function __callStatic($attr) {
