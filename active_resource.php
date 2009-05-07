@@ -5,16 +5,15 @@ require dirname(__FILE__).'/lib/curl.php';
 class ActiveResource {
   protected $attributes;
   public $site = 'http://localhost:3000';
+  public $user, $password;
   public $timeout = 2000;
   public $connection;
   public $response;
-  public $resources;
   public $extension = 'xml';
   
   function __construct($attributes = array()) {
     $this->attributes = $attributes;
     $this->connection = new Curl;
-    $this->resources = pluralize(strtolower(get_class($this)));;
   }
   
   /* Class Methods */
@@ -101,7 +100,7 @@ class ActiveResource {
     
     if (isset($this->id)) {
       $this->connection->headers = array("Content-Type" => "application/xml");
-      $this->connection->put(self::element_url($this->id, $class), $data);
+      $resp = $this->connection->put(self::element_url($this->id, $class), $data);
       return true;
     }
     $this->connection->headers = array("Content-Type" => "application/xml");
@@ -142,8 +141,8 @@ class ActiveResource {
         throw new Exception("Object not found");
       }
 
-      $xml = simplexml_load_string($resp->body)->{strtolower($class)};
-      return new $class((array) $xml);
+      $xml = simplexml_load_string($response->body)->xpath("//". strtolower($class));
+      return new $class((array) $xml[0]);
     }
 
     static function find_every($class, $options = array()) {
@@ -170,7 +169,14 @@ class ActiveResource {
       extract(get_class_vars($class));
       if ($site[strlen($site) - 1] === '/')
         $site = substr($site, 0, -1);
-      return compact('site', 'timeout', 'extension');
+        
+      $parts = parse_url($site);
+      
+      if (isset($parts['user']) && isset($parts['password'])) {
+        $this->user = $parts['user'];
+        $this->password = $parts['password'];
+      }
+      return compact('user', 'password', 'site', 'timeout', 'extension');
     }
 
     static function collection_name($class = null) {
@@ -201,8 +207,11 @@ class ActiveResource {
       $src = '';
       $element = strtolower(get_class($this));
 
-      foreach ($params as $k => $v)
+      foreach ($params as $k => $v) {
+        if ($k === 'updated_at'|| $k === 'created_at') continue;
+         
         $src .= "<{$k}>". utf8_encode($v) ."</{$k}>";
+      }
       return "<{$element}>{$src}</{$element}>";
     }
 }

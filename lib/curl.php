@@ -75,6 +75,16 @@ class Curl
         curl_setopt($this->handle, CURLOPT_URL, $url);
         curl_setopt($this->handle, CURLOPT_USERAGENT, $this->user_agent);
         
+        $parts = parse_url($url);
+        
+        if(strpos($url, 'https') === 0)
+            curl_setopt($this->handle, CURLOPT_SSL_VERIFYPEER, false);
+
+        if(!empty($parts['user']) && !empty($parts['pass'])) {
+            curl_setopt($this->handle, CURLOPT_USERPWD, $parts['user'] . ":" . $parts['pass']);
+            $url = str_replace($parts['user'] . ":" . $parts['pass'].'@', '', $url);
+        }
+
         # Format custom headers for this request and set CURL option
         $headers = array();
         foreach ($this->headers as $key => $value) {
